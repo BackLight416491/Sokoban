@@ -2,4 +2,5 @@
 /build/
 /.idea/
 /.vscode/
+/.trae/
 *.iml
