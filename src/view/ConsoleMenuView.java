@@ -35,11 +35,24 @@ public class ConsoleMenuView {
      * - 无
      */
     public static void showTeam() {
-
+        System.out.println("*****************************");
+        System.out.println("*****************************");
+        System.out.println("           添砖加瓦            ");
+        System.out.println("          组长 刘宇航          ");
+        System.out.println("         副组长 赵帅尧         ");
+        System.out.println("         信息官 王宇晗         ");
+        System.out.println("         信息官 于诗鑫         ");
+        System.out.println("        产品经理 彭依萍         ");
+        System.out.println("        产品经理 夏佳阔         ");
+        System.out.println("         技术官 李俊杰         ");
+        System.out.println("         技术官 张启亮         ");
+        System.out.println("         技术官 余瑜           ");
+        System.out.println("*****************************");
+        System.out.println("*****************************");
     }
 
     /*
-     * 负责人: 
+     * 负责人: 余瑜
      * 功能: 展示玩法说明
      * 内容：
      * 1. 打印操作键位：W/S/A/D 移动，R 重开，Q 返回
@@ -51,11 +64,19 @@ public class ConsoleMenuView {
      * - 无
      */
     public static void showHowToPlay() {
-        
+        System.out.println("*****************************");
+        System.out.println("*****************************");
+        System.out.println("         移动:W/S/A/D         ");
+        System.out.println("         R 重开，Q 返回        ");
+        System.out.println("    推箱到目标点，全部到达即胜利! ");
+        System.out.println("     对现状不满意?按R重开局面    ");
+        System.out.println("        不想玩了?按Q退出        ");
+        System.out.println("*****************************");
+        System.out.println("*****************************");
     }
 
     /*
-     * 负责人: 
+     * 负责人: 余瑜
      * 功能: 展示设置界面
      * 内容：
      * 1. 打印设置占位文案（敬请期待）
@@ -66,11 +87,17 @@ public class ConsoleMenuView {
      * - 无
      */
     public static void showSettings() {
-
+        System.out.println("*******************************");
+        System.out.println("*******************************");
+        System.out.println("*******************************");
+        System.out.println("            敬请期待!            ");
+        System.out.println("*******************************");
+        System.out.println("*******************************");
+        System.out.println("*******************************");
     }
 
     /*
-     * 负责人: 
+     * 负责人: 余瑜
      * 功能: 展示选关界面
      * 内容：
      * 1. 打印选择范围：1-<total>

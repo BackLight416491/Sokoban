@@ -9,17 +9,17 @@ import static service.MoveValidator.canMove;
 
 public class GameEngine {
     /*
-     * 负责人: 
+     * 负责人:
      * 功能: 玩家按方向尝试移动并更新状态
      * 内容：
      * 1. 根据方向计算位移 `(dx, dy)`
      * 2. 检查目标格：
-     *    - 墙：移动失败
-     *    - 空地/目标：玩家移动成功
-     *    - 箱子/箱子在目标：检查箱子后方是否可推（空地/目标）
+     * - 墙：移动失败
+     * - 空地/目标：玩家移动成功
+     * - 箱子/箱子在目标：检查箱子后方是否可推（空地/目标）
      * 3. 执行状态更新：
-     *    - 更新玩家坐标与 `map`、必要时更新箱子位置
-     *    - 维护步数计数 `state.steps++`（如有）
+     * - 更新玩家坐标与 `map`、必要时更新箱子位置
+     * - 维护步数计数 `state.steps++`（如有）
      * 4. 返回移动是否成功
      * 异常与边界：
      * - 越界访问需提前判断
@@ -31,82 +31,108 @@ public class GameEngine {
      * - boolean：是否移动成功
      */
     public static boolean move(GameState state, int direction) {
-        boolean ysxmove =canMove(state,direction);
-        //往前一步的坐标ysxp
-        Position ysxp = new Position(0,0);
-        //往前二步的坐标ysxp2
-        Position ysxp2 = new Position(0,0);
-        //创建一个新的GameState便于直接替换state
-        GameState ysxstate = new GameState;
-        ysxstate = state;
-        if (ysxmove==false) {}
-        if (ysxmove==true) {
-            //根据direction确定判定的二维坐标
-            switch(direction) {
-                case 0:
-                    ysxp.x=state.player.x-1;
-                    ysxp2.x=state.player.x-1-1;
-                    ysxp.y=state.player.y;
-                    ysxp2.y=state.player.y;
-                    break;
-                case 1:
-                    ysxp.x=state.player.x+1;
-                    ysxp2.x=state.player.x+1+1;
-                    ysxp.y=state.player.y;
-                    ysxp2.y=state.player.y;
-                    break;
-                case 2:
-                    ysxp.x=state.player.x;
-                    ysxp2.x=state.player.x;
-                    ysxp.y=state.player.y-1;
-                    ysxp2.y=state.player.y-1-1;
-                    break;
-                case 3:
-                    ysxp.x=state.player.x;
-                    ysxp2.x=state.player.x;
-                    ysxp.y=state.player.y+1;
-                    ysxp2.y=state.player.y+1+1;
-                    break;
-            }
-
-            //分波次:判断有没有箱子
-            //有箱子但在目标点上
-            if (state.map[ysxp.x][ysxp.y]==5) {
-                //move player
-                ysxstate.player = ysxp;
-                ysxstate.map[ysxp.x][ysxp.y]=4;
-                ysxstate.map[state.player.x][state.player.y]=0;
-                ysxstate.map[ysxp2.x][ysxp2.y]=2;
-            //有箱子但不在目标点，要判断移动后箱子会不会到目标点上
-            }else if (state.map[ysxp.x][ysxp.y]==2) {
-                //move player
-                ysxstate.player = ysxp;
-                ysxstate.map[ysxp.x][ysxp.y]=4;
-                ysxstate.map[state.player.x][state.player.y]=0;
-                //如果移动箱子后会到目标点
-                if(ysxstate.base[ysxp2.x][ysxp2.y]==3){
-                    ysxstate.map[ysxp2.x][ysxp2.y]=5;
-                //如果移动箱子后不会到目标点
-                }else ysxstate.map[ysxp2.x][ysxp2.y]=2;
-
-            //没有箱子，但已经过Validator方法判断可移动，则直接移动玩家坐标
-            }else{ysxstate.player = ysxp;
-                ysxstate.map[ysxp.x][ysxp.y]=4;
-                ysxstate.map[state.player.x][state.player.y]=0;
-            }
-            ysxstate.steps++;
-            state = ysxstate;
-            return true;
-            }
-        return false;
+        // 根据方向计算位移 (dx, dy)：0上/1下/2左/3右
+        int dx = 0;
+        int dy = 0;
+        if (direction == 0) {
+            // 上：x-1
+            dx = -1;
+        }
+        else if (direction == 1) {
+            // 下：x+1
+            dx = 1;  
+        }
+        else if (direction == 2) {
+            // 左：y-1
+            dy = -1; 
+        }
+        else if (direction == 3) {
+            // 右：y+1
+            dy = 1;  
+        }
+        else {
+            // 非法方向，直接拒绝
+            return false;
         }
 
+        // 预取维度与玩家当前坐标
+        int rows = state.map.length;
+        int cols = 0;
+        if (rows > 0) {
+            cols = state.map[0].length;
+        }
+        int px = state.player.x;
+        int py = state.player.y;
 
-        return true;
+        // 前方格坐标
+        int nx = px + dx;
+        int ny = py + dy;
+
+        // 边界保护：先判范围再访问数组
+        if (nx < 0 || ny < 0 || nx >= rows || ny >= cols) {
+            return false;
+        }
+        // 判断静态地形：前方若是墙不可移动
+        if (state.base[nx][ny] == TileType.WALL.code) {
+            return false;
+        }
+
+        // 前方动态层元素
+        int dynNext = state.map[nx][ny];
+
+        // 走入空地（或无实体）：玩家前进一步
+        if (dynNext == TileType.EMPTY.code) {
+            // 清空玩家原位，玩家进入前方格
+            state.map[px][py] = TileType.EMPTY.code;
+            state.map[nx][ny] = TileType.PLAYER.code;
+            state.player.x = nx;
+            state.player.y = ny;
+            state.steps++;
+            return true;
+        }
+
+        // 推箱子：前方为箱子或箱子在目标
+        if (dynNext == TileType.BOX.code || dynNext == TileType.BOX_ON_GOAL.code) {
+            // 箱子后方格坐标
+            int bx = nx + dx;
+            int by = ny + dy;
+            // 边界保护
+            if (bx < 0 || by < 0 || bx >= rows || by >= cols) {
+                return false;
+            }
+            // 静态地形：后方是墙则不可推动
+            if (state.base[bx][by] == TileType.WALL.code) {
+                return false;
+            }
+            // 后方动态层：已有箱子也不可推动
+            int dynBehind = state.map[bx][by];
+            if (dynBehind == TileType.BOX.code || dynBehind == TileType.BOX_ON_GOAL.code) {
+                return false;
+            }
+
+            // 落点：若后方为目标 → 箱子在目标，否则普通箱子
+            if (state.base[bx][by] == TileType.GOAL.code) {
+                state.map[bx][by] = TileType.BOX_ON_GOAL.code;
+            }
+            else {
+                state.map[bx][by] = TileType.BOX.code;
+            }
+
+            // 玩家进入箱子原位，原位清空
+            state.map[nx][ny] = TileType.PLAYER.code;
+            state.map[px][py] = TileType.EMPTY.code;
+            state.player.x = nx;
+            state.player.y = ny;
+            state.steps++;
+            return true;
+        }
+
+        // 其它实体：不可移动
+        return false;
     }
 
     /*
-     * 负责人: 
+     * 负责人:
      * 功能: 判断当前关卡是否已完成
      * 内容：
      * 1. 遍历地图，统计未在目标点上的箱子
@@ -119,7 +145,13 @@ public class GameEngine {
      * - boolean：是否胜利
      */
     public static boolean isWin(GameState state) {
-        
+        for (int i = 0; i < state.map.length; i++) {
+            for (int j = 0; j < state.map[i].length; j++) {
+                if (state.map[i][j] == TileType.BOX.code && state.base[i][j] != TileType.GOAL.code) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 }

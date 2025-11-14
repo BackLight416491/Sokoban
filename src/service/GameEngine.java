@@ -27,12 +27,103 @@ public class GameEngine {
      * - boolean：是否移动成功
      */
     public static boolean move(GameState state, int direction) {
-        
-        return true;
+        // 根据方向计算位移 (dx, dy)：0上/1下/2左/3右
+        int dx = 0;
+        int dy = 0;
+        if (direction == 0) {
+            // 上：x-1
+            dx = -1;
+        } else if (direction == 1) {
+            // 下：x+1
+            dx = 1;
+        } else if (direction == 2) {
+            // 左：y-1
+            dy = -1;
+        } else if (direction == 3) {
+            // 右：y+1
+            dy = 1;
+        } else {
+            // 非法方向，直接拒绝
+            return false;
+        }
+
+        // 预取维度与玩家当前坐标
+        int rows = state.map.length;
+        int cols = 0;
+        if (rows > 0) {
+            cols = state.map[0].length;
+        }
+        int px = state.player.x;
+        int py = state.player.y;
+
+        // 前方格坐标
+        int nx = px + dx;
+        int ny = py + dy;
+
+        // 边界保护：先判范围再访问数组
+        if (nx < 0 || ny < 0 || nx >= rows || ny >= cols) {
+            return false;
+        }
+        // 判断静态地形：前方若是墙不可移动
+        if (state.base[nx][ny] == TileType.WALL.code) {
+            return false;
+        }
+
+        // 前方动态层元素
+        int dynNext = state.map[nx][ny];
+
+        // 走入空地（或无实体）：玩家前进一步
+        if (dynNext == TileType.EMPTY.code) {
+            // 清空玩家原位，玩家进入前方格
+            state.map[px][py] = TileType.EMPTY.code;
+            state.map[nx][ny] = TileType.PLAYER.code;
+            state.player.x = nx;
+            state.player.y = ny;
+            state.steps++;
+            return true;
+        }
+
+        // 推箱子：前方为箱子或箱子在目标
+        if (dynNext == TileType.BOX.code || dynNext == TileType.BOX_ON_GOAL.code) {
+            // 箱子后方格坐标
+            int bx = nx + dx;
+            int by = ny + dy;
+            // 边界保护
+            if (bx < 0 || by < 0 || bx >= rows || by >= cols) {
+                return false;
+            }
+            // 静态地形：后方是墙则不可推动
+            if (state.base[bx][by] == TileType.WALL.code) {
+                return false;
+            }
+            // 后方动态层：已有箱子也不可推动
+            int dynBehind = state.map[bx][by];
+            if (dynBehind == TileType.BOX.code || dynBehind == TileType.BOX_ON_GOAL.code) {
+                return false;
+            }
+
+            // 落点：若后方为目标 → 箱子在目标，否则普通箱子
+            if (state.base[bx][by] == TileType.GOAL.code) {
+                state.map[bx][by] = TileType.BOX_ON_GOAL.code;
+            } else {
+                state.map[bx][by] = TileType.BOX.code;
+            }
+
+            // 玩家进入箱子原位，原位清空
+            state.map[nx][ny] = TileType.PLAYER.code;
+            state.map[px][py] = TileType.EMPTY.code;
+            state.player.x = nx;
+            state.player.y = ny;
+            state.steps++;
+            return true;
+        }
+
+        // 其它实体：不可移动
+        return false;
     }
 
     /*
-     * 负责人: 
+     * 负责人: 赵帅尧
      * 功能: 判断当前关卡是否已完成
      * 内容：
      * 1. 遍历地图，统计未在目标点上的箱子
@@ -45,7 +136,13 @@ public class GameEngine {
      * - boolean：是否胜利
      */
     public static boolean isWin(GameState state) {
-        
+        for (int i = 0; i < state.map.length; i++) {
+            for (int j = 0; j < state.map[i].length; j++) {
+                if (state.map[i][j] == TileType.BOX.code && state.base[i][j] != TileType.GOAL.code) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 }

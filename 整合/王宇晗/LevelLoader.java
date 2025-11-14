@@ -62,18 +62,25 @@ public class LevelLoader {
 
         // 2. 校验map文件夹是否存在
         if (!mapDir.exists() || !mapDir.isDirectory()) {
-            System.err.println("关卡目录不存在：" + mapDir.getAbsolutePath());
             return 1;
         }
 
         // 3. 筛选map文件夹中以"level"开头、".txt"结尾的文件
         File[] levelFiles = mapDir.listFiles(file -> {
+            if (file == null || !file.isFile() || !file.canRead()) {
+                return false;
+            }
             String fileName = file.getName();
             return fileName.startsWith("level") && fileName.endsWith(".txt");
         });
 
-        // 4. 返回有效关卡文件的数量（至少能识别到level1~level5这5个文件）
-        return (levelFiles != null) ? levelFiles.length : 0;
+        // 4. 统计符合条件的文件数量
+        int count = (levelFiles != null) ? levelFiles.length : 0;
+        return count > 0 ? count : 1;
+    }
+
+    public static int totalLevels() {
+        return countLevels();
     }
 
     /*

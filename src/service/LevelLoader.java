@@ -3,6 +3,9 @@ package service;
 import model.GameState;
 import model.Position;
 import model.TileType;
+
+import java.io.BufferedReader;
+import java.io.File;
 import java.nio.file.*;
 import java.util.*;
 
@@ -94,7 +97,7 @@ public class LevelLoader {
 
 
     /*
-     * 负责人: 
+     * 负责人: 王宇晗
      * 功能: 统计关卡数量
      * 内容：
      * 1. 扫描 `map` 目录：匹配形如 `level*.txt` 的关卡文件
@@ -109,8 +112,29 @@ public class LevelLoader {
      * - int：关卡总数
      */
     private static int countLevels() {
+        // 1. 定位到项目内的map文件夹（相对项目根目录的路径）
+        String levelDirPath = "map/";
+        File mapDir = new File(levelDirPath);
 
-        return 1;
+        // 2. 校验map文件夹是否存在
+        if (!mapDir.exists() || !mapDir.isDirectory()) {
+            return 1;
+        }
+
+        // 3. 筛选map文件夹中以"level"开头、".txt"结尾的文件
+        File[] levelFiles = mapDir.listFiles(file -> {
+            if (file == null || !file.isFile() || !file.canRead()) {
+                return false;
+            }
+            String fileName = file.getName();
+            return fileName.startsWith("level") && fileName.endsWith(".txt");
+        });
+
+        // 4. 统计符合条件的文件数量
+        if (levelFiles == null || levelFiles.length == 0) {
+            return 1;
+        }
+        return levelFiles.length;
     }
 
     public static int totalLevels() {
