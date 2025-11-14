@@ -5,7 +5,7 @@ import model.TileType;
 
 public class GameEngine {
     /*
-     * 负责人: 
+     * 负责人: 于诗鑫
      * 功能: 玩家按方向尝试移动并更新状态
      * 内容：
      * 1. 根据方向计算位移 `(dx, dy)`

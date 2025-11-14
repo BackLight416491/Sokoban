@@ -20,30 +20,28 @@ public class ConsoleGameView {
         返回值:
         - 无
     */
-    /*
-     * 清屏字符串多了一个 ] 字符，应为 "\u001B[2J\u001B[3J\u001B[H"(42)
-     * 剩余目标点计算错误： base[i][j] == 3 && base[i][j] != 5 永远等价于 base[i][j] == 3 ，且未扣除 map中的 BOX_ON_GOAL(5)(48-55)
-     */
     public static void render(GameState state) {
         // 异常与边界处理：
         // 若状态为空不渲染
         if (state == null) {
             return;
         }
+
         // 校验地图行列尺寸是否一致，不一致则不渲染
         int[][] base = state.base;
         int[][] map = state.map;
-        if (base == null || map == null
-                || base.length == 0 || map.length == 0 || base[0] == null || map[0] == null
-                || base.length != map.length
-                || base[0].length != map[0].length) {
+        if (base == null || map == null || base.length == 0 || map.length == 0 || base[0] == null || map[0] == null
+                || base.length != map.length || base[0].length != map[0].length) {
             return;
         }
+        
         // 获取基础层地图布局的行数和列数
         int rowCount = base.length;
         int colCount = base[0].length;
+
         // 清屏并将光标置顶
         System.out.println("\u001B[2J\u001B[3J\u001B[H");
+
         // 打印状态栏：当前关卡/总关卡、剩余目标点、步数
         // 先计算剩余目标点remainingTargets
         int remainingTargets = 0;
@@ -54,9 +52,11 @@ public class ConsoleGameView {
                 }
             }
         }
+        
         // 然后打印状态栏：当前关卡/总关卡、剩余目标点、步数
-        System.out.printf("当前关卡:%d/总关卡:%d | 剩余目标点:%d | 步数:%d",
-                state.levelIndex, state.totalLevels, remainingTargets, state.steps);
+        System.out.printf("当前关卡:%d/总关卡:%d | 剩余目标点:%d | 步数:%d", state.levelIndex + 1, state.totalLevels, remainingTargets, state.steps);
+        System.out.println();
+
         // 遍历行列，根据 `Renderer.toChar` 输出地图
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < colCount; j++) {
@@ -66,6 +66,7 @@ public class ConsoleGameView {
             // 每打印完一行地图就换行
             System.out.println();
         }
+
         // 打印操作提示：W/S/A/D，R，Q
         System.out.println("操作提示：W上，S下，A左，D右，R重新开始，Q返回主菜单");
     }

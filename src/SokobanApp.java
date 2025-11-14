@@ -32,6 +32,7 @@ public class SokobanApp {
             // 展示主菜单
             ConsoleMenuView.showMain();
             String input = scanner.nextLine();
+
             // 处理用户输入
             if ("1".equals(input)) {
                 gameLoop(scanner, 0);
@@ -82,6 +83,7 @@ public class SokobanApp {
     private static void gameLoop(Scanner scanner, int levelIndex) {
         GameState state = LevelLoader.load(levelIndex);
         ConsoleGameView.render(state);
+        
         while (true) {
             // 渲染游戏状态
             ConsoleGameView.render(state);
